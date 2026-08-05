@@ -21,6 +21,22 @@ function createPrismaClient(): PrismaClient {
   return new PrismaClient();
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+// Construção OPCIONAL (lazy). O Next.js importa este módulo durante o build
+// ("Collecting page data" em toda rota que usa auth/prisma) apenas para
+// inspecionar exports — nunca deve executar uma query nesse momento. Se a
+// conexão fosse criada aqui, de forma eager, qualquer problema de
+// configuração do banco (env var ausente/malformada) derrubava o build
+// inteiro em vez de falhar só em runtime. Com o Proxy, a conexão real só é
+// criada na primeira chamada de fato (ex: prisma.occurrence.findMany).
+function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getPrismaClient() as object, prop, receiver);
+  },
+});
