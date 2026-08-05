@@ -1,0 +1,166 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  binaryTargets   = ["native", "windows"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum Category {
+  ACCIDENT
+  NEAR_MISS
+  RISK
+  MAINTENANCE
+  INFRASTRUCTURE
+  SAFETY
+  OTHER
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Status {
+  OPEN
+  REVIEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id            String        @id @default(uuid())
+  name          String?
+  email         String       @unique
+  image         String?
+  role          RoleName     @default(EMPLOYEE)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  occurrences   Occurrence[]  @relation("reporter")
+  assignments   Occurrence[]  @relation("assignee")
+  comments        Comment[]
+  statusHistories StatusHistory[]
+  auditEntries    AuditLog[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Location {
+  id        String      @id @default(uuid())
+  name      String
+  parentId  String?     
+  type      String
+  children  Location[]  @relation("LocationChildren")
+  parent    Location?   @relation("LocationChildren", fields: [parentId], references: [id])
+  occurrences Occurrence[]
+}
+
+model Occurrence {
+  id             String         @id @default(uuid())
+  title          String
+  description    String       @db.Text
+  category       Category
+  severity       Severity
+  status         Status        @default(OPEN)
+  reporterId     String?
+  isAnonymous    Boolean        @default(false)
+  anonContact    String?
+  assigneeId     String?
+  locationId     String?
+  latitude       Decimal?      @db.Decimal(9, 6)
+  longitude      Decimal?      @db.Decimal(9, 6)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  dueDate        DateTime?
+  comments       Comment[]
+  attachments    Attachment[]
+  statusHistory  StatusHistory[]
+  reporter       User?          @relation("reporter", fields: [reporterId], references: [id])
+  assignee       User?          @relation("assignee", fields: [assigneeId], references: [id])
+  location       Location?      @relation(fields: [locationId], references: [id])
+}
+
+model Attachment {
+  id           String      @id @default(uuid())
+  occurrenceId String
+  url          String
+  label        String?
+  createdAt    DateTime    @default(now())
+
+  occurrence Occurrence @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id           String      @id @default(uuid())
+  occurrenceId String
+  authorId     String
+  content      String      @db.Text
+  createdAt    DateTime    @default(now())
+
+  occurrence Occurrence @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model StatusHistory {
+  id            String      @id @default(uuid())
+  occurrenceId  String
+  previous      Status
+  current       Status
+  note          String?     @db.Text
+  createdById   String
+  createdAt     DateTime    @default(now())
+
+  occurrence Occurrence @relation(fields: [occurrenceId], references: [id], onDelete: Cascade)
+  createdBy  User       @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String
+  action      String
+  resource    String
+  details     String?     @db.Text
+  createdAt   DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
