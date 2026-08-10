@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, AlertCircle, RefreshCw, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ShieldCheck } from 'lucide-react';
 import { LocationSelect } from './location-select';
 import { ImageUpload } from './image-upload';
-import { useGeolocation } from '@/lib/hooks/useGeolocation';
 import {
   isOnline,
   submitAnonymousOccurrenceOnline,
@@ -30,8 +29,6 @@ const severityLabels: Record<(typeof SEVERITIES)[number], string> = {
 };
 
 export function AnonymousOccurrenceForm() {
-  const { coordinates, loading: geoLoading, error: geoError, requestPermission } = useGeolocation();
-
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -39,7 +36,6 @@ export function AnonymousOccurrenceForm() {
     severity: 'MEDIUM' as (typeof SEVERITIES)[number],
     locationId: '',
     images: [] as string[],
-    contact: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -73,10 +69,10 @@ export function AnonymousOccurrenceForm() {
       category: form.category,
       severity: form.severity,
       locationId: form.locationId || null,
-      latitude: coordinates?.latitude ?? null,
-      longitude: coordinates?.longitude ?? null,
+      latitude: null,
+      longitude: null,
       images: form.images,
-      contact: form.contact.trim() || null,
+      contact: null,
     };
 
     try {
@@ -89,7 +85,6 @@ export function AnonymousOccurrenceForm() {
         severity: 'MEDIUM',
         locationId: '',
         images: [],
-        contact: '',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao registrar ocorrência');
@@ -126,7 +121,7 @@ export function AnonymousOccurrenceForm() {
         <ShieldCheck className="h-5 w-5 shrink-0" />
         <p className="text-sm">
           Este registro é <strong>anônimo</strong>: não é necessário login e nenhum dado de identificação é
-          coletado, exceto o contato opcional abaixo (se você quiser ser procurado).
+          coletado.
         </p>
       </div>
 
@@ -208,40 +203,6 @@ export function AnonymousOccurrenceForm() {
         onChange={(images) => setForm({ ...form, images })}
         label="Fotos do problema (câmera ou galeria)"
       />
-
-      <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/95 px-4 py-3">
-        <MapPin className="h-5 w-5 shrink-0 text-brand-500" />
-        <div className="flex-1">
-          <p className="text-sm text-slate-600">Geolocalização (opcional)</p>
-          {geoLoading && <p className="text-xs text-slate-500">Capturando localização...</p>}
-          {geoError && <p className="text-xs text-red-500">{geoError}</p>}
-          {coordinates && (
-            <p className="text-xs text-emerald-600">
-              ✓ Lat: {coordinates.latitude.toFixed(4)}, Lng: {coordinates.longitude.toFixed(4)}
-            </p>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={requestPermission}
-          disabled={geoLoading}
-          className="inline-flex items-center gap-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
-        >
-          <RefreshCw className="h-3.5 w-3.5" />
-          Atualizar
-        </button>
-      </div>
-
-      <label className="block">
-        <span className="text-sm text-slate-600">Contato para retorno (opcional)</span>
-        <input
-          value={form.contact}
-          onChange={(event) => setForm({ ...form, contact: event.target.value })}
-          maxLength={200}
-          className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50/95 px-4 py-3 text-slate-900 outline-none"
-          placeholder="E-mail ou telefone, apenas se quiser ser procurado"
-        />
-      </label>
 
       <button
         type="submit"
