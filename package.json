@@ -16,7 +16,7 @@
     "prisma:seed": "node scripts/run-with-env.mjs npx ts-node --esm prisma/seed.ts",
     "prisma:setup": "npm run prisma:push && npm run prisma:seed",
     "prisma:setup:sql": "echo Execute prisma/init-neon-sql-editor.sql no Neon SQL Editor (Dashboard do Neon)",
-    "postinstall": "node -e \"try{require('fs').accessSync('node_modules/.prisma/client/index.js');process.exit(0)}catch(e){process.exit(1)}\" || prisma generate",
+    "postinstall": "node -e \"if(process.env.VERCEL){process.exit(1)}try{require('fs').accessSync('node_modules/.prisma/client/index.js');process.exit(0)}catch(e){process.exit(1)}\" || prisma generate",
     "validate:fase3": "node scripts/validate-fase3.mjs",
     "validate:fase4": "node scripts/validate-fase4.mjs",
     "validate:fase5": "node scripts/validate-fase5.mjs",
