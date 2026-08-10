@@ -32,18 +32,52 @@ export function useCamera(): UseCamera {
         return;
       }
 
-      // Solicitar acesso
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment', // Câmera traseira em celulares
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
+      // Solicitar acesso. Alguns dispositivos/navegadores não conseguem
+      // satisfazer a combinação de câmera traseira + resolução ideal e
+      // lançam OverconstrainedError — nesse caso, tentamos de novo com
+      // restrições cada vez mais simples em vez de desistir direto.
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment', // Câmera traseira em celulares
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch (err) {
+        if (err instanceof Error && err.name === 'OverconstrainedError') {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'environment' },
+              audio: false,
+            });
+          } catch {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: false,
+            });
+          }
+        } else {
+          throw err;
+        }
+      }
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        const video = videoRef.current;
+        video.srcObject = stream;
+        // Em alguns navegadores mobile (Safari/Chrome Android), atribuir o
+        // srcObject via JS depois de um await não é suficiente para o
+        // atributo autoPlay disparar sozinho — o vídeo fica "preso" sem
+        // exibir a imagem, mesmo com a permissão já concedida. Chamamos
+        // play() explicitamente para garantir que o stream realmente comece.
+        try {
+          await video.play();
+        } catch {
+          // Se o navegador ainda assim bloquear o autoplay, o próprio
+          // elemento <video> com controls (abaixo) permite iniciar manualmente.
+        }
         setIsCameraActive(true);
       }
     } catch (err) {
@@ -55,6 +89,8 @@ export function useCamera(): UseCamera {
           errorMsg = 'Câmera não encontrada';
         } else if (err.name === 'NotReadableError') {
           errorMsg = 'Câmera está sendo usada por outro aplicativo';
+        } else if (err.name === 'OverconstrainedError') {
+          errorMsg = 'Câmera traseira não disponível neste dispositivo';
         }
       }
       setError(errorMsg);

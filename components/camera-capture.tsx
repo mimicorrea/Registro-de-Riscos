@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useCamera } from '@/lib/hooks/useCamera';
-import { Camera, X, Check, Upload } from 'lucide-react';
+import { Camera, X, Check } from 'lucide-react';
 
 interface CameraCaptureProps {
   onCapture: (imageData: string) => void;
@@ -71,7 +71,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   if (isCameraActive && !capturedImage) {
     return (
       <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4">
-        <video ref={videoRef} autoPlay playsInline className="w-full rounded-2xl bg-black" />
+        <video ref={videoRef} autoPlay playsInline muted controls className="w-full rounded-2xl bg-black" />
         <canvas ref={canvasRef} className="hidden" />
         <div className="flex gap-3">
           <button
