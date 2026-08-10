@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { CameraCapture } from './camera-capture';
 import { LazyImage } from './lazy-image';
 import { Trash2, Eye } from 'lucide-react';
-import { compressImage, validateImageFile } from '@/lib/image-utils';
+import { compressImage, isHeicFile, validateImageFile } from '@/lib/image-utils';
 
 const MAX_IMAGES = 5;
 
@@ -62,8 +62,10 @@ export function ImageUpload({
 
       try {
         const dataUrl = await readFileAsDataUrl(file);
-        const compressed = await compressImage(dataUrl);
-        nextImages.push(compressed);
+        // Navegadores Android/Chrome não conseguem decodificar HEIC via <canvas>;
+        // nesse caso enviamos o arquivo original e deixamos o Cloudinary converter no servidor.
+        const processed = isHeicFile(file) ? dataUrl : await compressImage(dataUrl);
+        nextImages.push(processed);
       } catch {
         setError('Falha ao processar uma das imagens.');
       }
@@ -88,7 +90,7 @@ export function ImageUpload({
 
   return (
     <div className="space-y-4">
-      <label className="block">
+      <div className="block">
         <span className="text-sm text-slate-600">
           {label} ({images.length}/{maxImages})
         </span>
@@ -169,7 +171,7 @@ export function ImageUpload({
             ))}
           </div>
         )}
-      </label>
+      </div>
     </div>
   );
 }
