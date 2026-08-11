@@ -15,10 +15,10 @@ const withPWA = withPWAInit({
   buildExcludes: [/middleware-manifest\.json$/],
   runtimeCaching: [
     {
-      urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
+      urlPattern: /^https:\/\/.*\.public\.blob\.vercel-storage\.com\/.*/i,
       handler: 'StaleWhileRevalidate',
       options: {
-        cacheName: 'cloudinary-images',
+        cacheName: 'occurrence-images',
         expiration: { maxEntries: 64, maxAgeSeconds: 30 * 24 * 60 * 60 },
       },
     },
@@ -90,7 +90,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com',
+        hostname: '**.public.blob.vercel-storage.com',
       },
     ],
     formats: ['image/avif', 'image/webp'],

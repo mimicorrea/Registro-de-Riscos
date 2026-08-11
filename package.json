@@ -23,15 +23,16 @@
     "test": "npm run build && npm run validate:fase3 && npm run validate:fase4 && npm run validate:fase5"
   },
   "dependencies": {
-    "@prisma/client": "^5.11.1",
-    "@prisma/adapter-neon": "^5.11.1",
     "@neondatabase/serverless": "^0.10.4",
-    "cloudinary": "^2.5.1",
+    "@next-auth/prisma-adapter": "^1.0.0",
+    "@prisma/adapter-neon": "^5.11.1",
+    "@prisma/client": "^5.11.1",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/blob": "^2.8.0",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.439.0",
     "next": "^15.4.1",
     "next-auth": "^4.24.11",
-    "@next-auth/prisma-adapter": "^1.0.0",
     "next-pwa": "^5.6.0",
     "postcss": "^8.4.40",
     "prisma": "^5.11.1",
@@ -41,14 +42,13 @@
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.4",
     "ws": "^8.18.0",
-    "zod": "^3.23.8",
-    "@vercel/analytics": "^1.5.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
-    "@types/ws": "^8.5.13",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/ws": "^8.5.13",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.4.1",

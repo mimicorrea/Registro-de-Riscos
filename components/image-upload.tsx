@@ -62,8 +62,11 @@ export function ImageUpload({
 
       try {
         const dataUrl = await readFileAsDataUrl(file);
-        // Navegadores Android/Chrome não conseguem decodificar HEIC via <canvas>;
-        // nesse caso enviamos o arquivo original e deixamos o Cloudinary converter no servidor.
+        // Navegadores Android/Chrome não conseguem decodificar HEIC via <canvas>,
+        // então pulamos a compressão nesse caso e enviamos o arquivo original.
+        // Diferente do Cloudinary, o armazenamento atual (Vercel Blob) não
+        // converte formato — a foto HEIC é salva como está e pode não exibir
+        // preview em navegadores sem suporte nativo a HEIC (ex.: Chrome Android).
         const processed = isHeicFile(file) ? dataUrl : await compressImage(dataUrl);
         nextImages.push(processed);
       } catch {
