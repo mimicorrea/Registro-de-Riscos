@@ -67,8 +67,8 @@ export function OccurrenceForm() {
       return;
     }
 
-    if (form.description.trim().length < 10) {
-      setError('A descrição deve ter pelo menos 10 caracteres.');
+    if (form.description.trim().length < 5) {
+      setError('A descrição deve ter pelo menos 5 caracteres.');
       return;
     }
 
@@ -241,12 +241,14 @@ export function OccurrenceForm() {
       </div>
 
       <label className="block">
-        <span className="text-sm text-slate-600">Descrição detalhada</span>
+        <span className="text-sm text-slate-600">
+          Descrição detalhada <span className="text-red-500">*</span>
+        </span>
         <textarea
           value={form.description}
           onChange={(event) => setForm({ ...form, description: event.target.value })}
           required
-          minLength={10}
+          minLength={5}
           rows={6}
           className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50/95 px-4 py-3 text-slate-900 outline-none"
           placeholder="Explique o ocorrido, impacto e circunstâncias."
