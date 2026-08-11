@@ -14,6 +14,7 @@ export type MetricsOccurrence = {
   isAnonymous?: boolean;
   location: { name: string } | null;
   statusHistory: { current: OccurrenceStatus; createdAt: Date | string }[];
+  attachments?: { id: string; url: string; label: string | null }[];
 };
 
 export type DashboardKpis = {

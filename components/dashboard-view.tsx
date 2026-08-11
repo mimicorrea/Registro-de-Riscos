@@ -5,6 +5,7 @@ import { signOut } from 'next-auth/react';
 import { useMemo, useState } from 'react';
 import { BarChart3, CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
+import { LazyImage } from '@/components/lazy-image';
 import StatusBadge from '@/components/status-badge';
 import {
   SEVERITY_LABELS,
@@ -209,13 +210,22 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                   className="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-brand-400"
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900">{occurrence.title}</h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-slate-500">{occurrence.description}</p>
-                      <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-500">
-                        <span>📍 {occurrence.location?.name ?? 'Sem local'}</span>
-                        <span>👤 {occurrence.reporter?.name ?? (occurrence.isAnonymous ? 'Anônimo' : 'Usuário')}</span>
-                        <span>{new Date(occurrence.createdAt).toLocaleDateString('pt-BR')}</span>
+                    <div className="flex min-w-0 flex-1 gap-4">
+                      {occurrence.attachments?.[0] && (
+                        <LazyImage
+                          src={occurrence.attachments[0].url}
+                          alt={occurrence.attachments[0].label || 'Foto da ocorrência'}
+                          className="h-16 w-16 shrink-0 rounded-2xl"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-lg font-semibold text-slate-900">{occurrence.title}</h3>
+                        <p className="mt-2 line-clamp-2 text-sm text-slate-500">{occurrence.description}</p>
+                        <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-500">
+                          <span>📍 {occurrence.location?.name ?? 'Sem local'}</span>
+                          <span>👤 {occurrence.reporter?.name ?? (occurrence.isAnonymous ? 'Anônimo' : 'Usuário')}</span>
+                          <span>{new Date(occurrence.createdAt).toLocaleDateString('pt-BR')}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
