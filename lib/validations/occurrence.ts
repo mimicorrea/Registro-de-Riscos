@@ -3,7 +3,7 @@ import { CATEGORIES, SEVERITIES } from '@/lib/enums';
 
 export const createOccurrenceSchema = z.object({
   title: z.string().trim().min(3, 'Título muito curto').max(200),
-  description: z.string().trim().min(10, 'Descrição muito curta').max(10000),
+  description: z.string().trim().min(5, 'Descrição muito curta').max(10000),
   category: z.enum(CATEGORIES),
   severity: z.enum(SEVERITIES),
   locationId: z
