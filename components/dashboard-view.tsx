@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { useMemo, useState } from 'react';
-import { BarChart3, CheckCircle2, Clock, Download, FileText, ShieldAlert, Timer } from 'lucide-react';
+import { BarChart3, CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
 import StatusBadge from '@/components/status-badge';
 import {
@@ -92,6 +93,14 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
               >
                 Ver todas
               </Link>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-red-50 hover:text-red-700"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </button>
             </div>
           </div>
         </header>
