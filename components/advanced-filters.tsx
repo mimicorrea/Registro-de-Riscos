@@ -25,11 +25,8 @@ export interface FilterState {
 }
 
 const STATUS_OPTIONS: Array<{ value: OccurrenceStatus; label: string }> = [
-  { value: 'OPEN', label: 'Aberta' },
-  { value: 'REVIEW', label: 'Em análise' },
   { value: 'IN_PROGRESS', label: 'Em andamento' },
-  { value: 'RESOLVED', label: 'Resolvida' },
-  { value: 'CLOSED', label: 'Encerrada' },
+  { value: 'RESOLVED', label: 'Concluída' },
 ];
 
 const SEVERITY_OPTIONS: Array<{ value: OccurrenceSeverity; label: string }> = [

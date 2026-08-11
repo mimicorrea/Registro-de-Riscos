@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useMemo, useState } from 'react';
-import { BarChart3, CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer } from 'lucide-react';
+import { CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
 import { LazyImage } from '@/components/lazy-image';
 import StatusBadge from '@/components/status-badge';
@@ -41,15 +41,13 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
   const maxTrend = Math.max(...trend.map((p) => p.count), 1);
 
   const total = filtered.length;
-  const openCount = filtered.filter((o) => o.status === 'OPEN').length;
-  const resolvedCount = filtered.filter((o) => o.status === 'RESOLVED' || o.status === 'CLOSED').length;
-  const pendingCount = filtered.filter((o) => o.status === 'REVIEW' || o.status === 'IN_PROGRESS').length;
+  const inProgressCount = filtered.filter((o) => o.status === 'IN_PROGRESS').length;
+  const resolvedCount = filtered.filter((o) => o.status === 'RESOLVED').length;
 
   const stats = [
     { title: 'Total filtrado', value: total, icon: FileText },
-    { title: 'Abertas', value: openCount, icon: ShieldAlert },
-    { title: 'Resolvidas', value: resolvedCount, icon: CheckCircle2 },
-    { title: 'Em tratamento', value: pendingCount, icon: BarChart3 },
+    { title: 'Em andamento', value: inProgressCount, icon: ShieldAlert },
+    { title: 'Concluídas', value: resolvedCount, icon: CheckCircle2 },
   ];
 
   const severityCounts = (['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as OccurrenceSeverity[]).map((severity) => {
@@ -141,7 +139,7 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-3">
           {stats.map((item) => (
             <div
               key={item.title}
