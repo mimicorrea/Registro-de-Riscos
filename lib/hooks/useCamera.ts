@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 
 interface UseCamera {
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -16,6 +16,7 @@ interface UseCamera {
 export function useCamera(): UseCamera {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasCamera, setHasCamera] = useState(true);
@@ -64,22 +65,14 @@ export function useCamera(): UseCamera {
         }
       }
 
-      if (videoRef.current) {
-        const video = videoRef.current;
-        video.srcObject = stream;
-        // Em alguns navegadores mobile (Safari/Chrome Android), atribuir o
-        // srcObject via JS depois de um await não é suficiente para o
-        // atributo autoPlay disparar sozinho — o vídeo fica "preso" sem
-        // exibir a imagem, mesmo com a permissão já concedida. Chamamos
-        // play() explicitamente para garantir que o stream realmente comece.
-        try {
-          await video.play();
-        } catch {
-          // Se o navegador ainda assim bloquear o autoplay, o próprio
-          // elemento <video> com controls (abaixo) permite iniciar manualmente.
-        }
-        setIsCameraActive(true);
-      }
+      // Importante: o <video> só é renderizado no JSX quando isCameraActive
+      // é true (ver camera-capture.tsx), então nesse momento o elemento
+      // ainda NÃO existe no DOM e videoRef.current é null — atribuir o
+      // stream aqui não funcionaria. Guardamos o stream numa ref e deixamos
+      // o useEffect abaixo (que roda depois do React montar o <video>)
+      // fazer a atribuição de fato.
+      streamRef.current = stream;
+      setIsCameraActive(true);
     } catch (err) {
       let errorMsg = 'Erro ao acessar câmera';
       if (err instanceof Error) {
@@ -98,12 +91,35 @@ export function useCamera(): UseCamera {
     }
   }, []);
 
+  // Só roda depois que isCameraActive vira true e o React já comitou o
+  // <video> no DOM — é aqui, e não dentro de startCamera, que o stream é
+  // de fato ligado ao elemento.
+  useEffect(() => {
+    if (!isCameraActive || !streamRef.current || !videoRef.current) return;
+
+    const video = videoRef.current;
+    video.srcObject = streamRef.current;
+
+    // Em alguns navegadores mobile (Safari/Chrome Android), atribuir o
+    // srcObject não é suficiente para o atributo autoPlay disparar
+    // sozinho — a permissão é concedida mas o vídeo fica "preso" sem
+    // exibir imagem. Chamamos play() explicitamente para garantir que o
+    // stream realmente comece a ser exibido.
+    video.play().catch(() => {
+      // Se o navegador ainda assim bloquear o autoplay, o atributo
+      // controls no <video> permite iniciar manualmente.
+    });
+  }, [isCameraActive]);
+
   const stopCamera = useCallback(() => {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach((track) => track.stop());
-      setIsCameraActive(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setIsCameraActive(false);
   }, []);
 
   const capturePhoto = useCallback((): string | null => {
