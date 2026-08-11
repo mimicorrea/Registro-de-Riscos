@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { uploadImage } from '@/lib/cloudinary';
+import { uploadImage } from '@/lib/blob-storage';
 import { apiError, apiJson, enforceRateLimit, parseBody } from '@/lib/api-utils';
 import { uploadImageSchema } from '@/lib/validations/occurrence';
 

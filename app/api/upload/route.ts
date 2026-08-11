@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { uploadImage } from '@/lib/cloudinary';
+import { uploadImage } from '@/lib/blob-storage';
 import { apiError, apiJson, parseBody } from '@/lib/api-utils';
 import { uploadImageSchema } from '@/lib/validations/occurrence';
 
