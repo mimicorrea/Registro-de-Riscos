@@ -36,8 +36,13 @@ export default function OccurrenceDetail({
 
   const isOverdue =
     occurrence.dueDate &&
-    !['RESOLVED', 'CLOSED'].includes(occurrence.status) &&
+    occurrence.status !== 'RESOLVED' &&
     new Date(occurrence.dueDate) < new Date();
+
+  // A foto original (enviada por quem registrou a ocorrência) já aparece nos
+  // cards de lista/dashboard — aqui mostramos só as fotos de correção,
+  // enviadas pelo gestor ao tratar/resolver o problema.
+  const correctionPhotos = occurrence.attachments.filter((a) => a.label?.startsWith('Correção'));
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -239,11 +244,11 @@ export default function OccurrenceDetail({
           </div>
 
           <div className="space-y-6 lg:col-span-2">
-            {occurrence.attachments.length > 0 && (
+            {correctionPhotos.length > 0 && (
               <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="mb-4 text-lg font-semibold text-slate-900">📷 Fotos</h3>
+                <h3 className="mb-4 text-lg font-semibold text-slate-900">📷 Fotos da correção</h3>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {occurrence.attachments.map((attachment) => (
+                  {correctionPhotos.map((attachment) => (
                     <div key={attachment.id} className="group relative">
                       <LazyImage
                         src={attachment.url}

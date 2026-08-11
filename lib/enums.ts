@@ -1,27 +1,17 @@
-export const OCCURRENCE_STATUSES = [
-  'OPEN',
-  'REVIEW',
-  'IN_PROGRESS',
-  'RESOLVED',
-  'CLOSED',
-] as const;
+// Fluxo simplificado: toda ocorrência nasce "Em andamento" e o gestor marca
+// "Concluída" quando resolver (podendo reabrir se necessário).
+export const OCCURRENCE_STATUSES = ['IN_PROGRESS', 'RESOLVED'] as const;
 
 export type OccurrenceStatus = (typeof OCCURRENCE_STATUSES)[number];
 
 export const STATUS_LABELS: Record<OccurrenceStatus, string> = {
-  OPEN: 'Aberta',
-  REVIEW: 'Em análise',
   IN_PROGRESS: 'Em andamento',
-  RESOLVED: 'Resolvida',
-  CLOSED: 'Encerrada',
+  RESOLVED: 'Concluída',
 };
 
 export const STATUS_FLOW: Record<OccurrenceStatus, OccurrenceStatus[]> = {
-  OPEN: ['REVIEW', 'IN_PROGRESS'],
-  REVIEW: ['IN_PROGRESS', 'OPEN'],
-  IN_PROGRESS: ['RESOLVED', 'REVIEW'],
-  RESOLVED: ['CLOSED', 'IN_PROGRESS'],
-  CLOSED: [],
+  IN_PROGRESS: ['RESOLVED'],
+  RESOLVED: ['IN_PROGRESS'],
 };
 
 export const CATEGORIES = [

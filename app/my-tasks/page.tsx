@@ -34,7 +34,7 @@ export default async function MyTasksPage() {
     where: {
       assigneeId: session.user.id,
       NOT: {
-        status: 'CLOSED',
+        status: 'RESOLVED',
       },
     },
     include: {
@@ -64,24 +64,10 @@ export default async function MyTasksPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">
             <div className="text-slate-400 text-sm mb-1">Total</div>
             <div className="text-3xl font-bold text-slate-900">{occurrences.length}</div>
-          </div>
-
-          <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">
-            <div className="text-slate-400 text-sm mb-1">Abertas</div>
-            <div className="text-3xl font-bold text-red-400">
-              {occurrences.filter((o) => o.status === 'OPEN').length}
-            </div>
-          </div>
-
-          <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">
-            <div className="text-slate-400 text-sm mb-1">Em Análise</div>
-            <div className="text-3xl font-bold text-yellow-400">
-              {occurrences.filter((o) => o.status === 'REVIEW').length}
-            </div>
           </div>
 
           <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">

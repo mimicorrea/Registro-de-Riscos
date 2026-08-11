@@ -34,7 +34,7 @@ export const createAnonymousOccurrenceSchema = createOccurrenceSchema.extend({
 });
 
 export const updateStatusSchema = z.object({
-  status: z.enum(['OPEN', 'REVIEW', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']),
+  status: z.enum(['IN_PROGRESS', 'RESOLVED']),
   note: z.string().trim().min(5).max(5000),
 });
 
