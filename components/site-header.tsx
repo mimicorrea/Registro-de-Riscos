@@ -15,7 +15,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-xl shadow-sm print:hidden">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-        <Link href="/" className="text-xl font-semibold text-slate-900">
+        <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-slate-900">
+          <img src="/logo.png" alt="Logo Gestor de Riscos" className="h-8 w-8 shrink-0 rounded-md" />
           Gestor de Riscos
         </Link>
         <nav className="flex flex-wrap items-center gap-2 text-slate-600 sm:gap-3">
