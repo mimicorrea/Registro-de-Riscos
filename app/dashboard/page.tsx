@@ -26,6 +26,11 @@ export default async function DashboardPage() {
       reporter: { select: { name: true } },
       location: { select: { name: true } },
       statusHistory: { select: { current: true, createdAt: true } },
+      attachments: {
+        select: { id: true, url: true, label: true },
+        orderBy: { createdAt: 'asc' },
+        take: 1,
+      },
     },
     orderBy: { createdAt: 'desc' },
   })) as MetricsOccurrence[];
