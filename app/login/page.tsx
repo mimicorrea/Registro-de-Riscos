@@ -4,11 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { ArrowLeft, Lock, Mail, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Lock, Mail, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function LoginPage() {
             <div className="mt-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <Lock className="h-5 w-5 text-brand-300" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -81,6 +82,15 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 className="w-full border-none bg-transparent text-base text-slate-900 outline-none placeholder:text-slate-500"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="shrink-0 text-slate-400 hover:text-slate-700"
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
           </label>
           <button
@@ -91,10 +101,6 @@ export default function LoginPage() {
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-sm text-slate-400">
-          Credenciais para teste: admin@empresa.com / Senha123!
-        </p>
       </div>
     </main>
   );
