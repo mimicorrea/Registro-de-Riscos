@@ -25,7 +25,7 @@ export default async function OccurrencesPage() {
     where: isAuthenticated && !isManager ? { reporterId: session!.user!.id } : undefined,
     include: {
       reporter: { select: { name: true } },
-      location: { select: { name: true } },
+      location: { select: { id: true, name: true } },
       statusHistory: { select: { current: true, createdAt: true } },
     },
     orderBy: { createdAt: 'desc' },

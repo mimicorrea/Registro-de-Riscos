@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   const occurrences = (await prisma.occurrence.findMany({
     include: {
       reporter: { select: { name: true } },
-      location: { select: { name: true } },
+      location: { select: { id: true, name: true } },
       statusHistory: { select: { current: true, createdAt: true } },
       attachments: {
         select: { id: true, url: true, label: true },

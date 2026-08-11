@@ -13,6 +13,11 @@ export function applyFilters(occurrences: MetricsOccurrence[], filters: FilterSt
     if (filters.categories.length > 0 && !filters.categories.includes(occurrence.category as OccurrenceCategory)) {
       return false;
     }
+    if (filters.locationIds.length > 0) {
+      if (!occurrence.location || !filters.locationIds.includes(occurrence.location.id)) {
+        return false;
+      }
+    }
     if (filters.search.trim()) {
       const term = filters.search.toLowerCase();
       const haystack = `${occurrence.title} ${occurrence.description} ${occurrence.location?.name ?? ''}`.toLowerCase();
