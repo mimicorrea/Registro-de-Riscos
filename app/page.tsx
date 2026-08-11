@@ -12,8 +12,8 @@ export default function HomePage() {
           <p className="text-sm uppercase tracking-[0.28em] text-brand-500">Gestor de Riscos</p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-900">Registrar ocorrência sem login</h1>
           <p className="mt-3 text-slate-500">
-            Preencha os dados do evento, anexe fotos e capture a localização automaticamente. Não é
-            necessário criar conta nem informar quem você é.
+            Identificou um risco ou uma situação que precisa de atenção? Registre a ocorrência de
+            forma rápida e segura, sem precisar fazer login.
           </p>
           <Link
             href="/occurrences"
