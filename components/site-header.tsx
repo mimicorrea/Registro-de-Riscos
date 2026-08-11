@@ -17,7 +17,10 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-slate-900">
           <img src="/logo.png" alt="Logo Gestor de Riscos" className="h-10 w-10 shrink-0" />
-          Gestor de Riscos
+          <span className="flex flex-col leading-tight">
+            <span>Gestor de</span>
+            <span>Riscos</span>
+          </span>
         </Link>
         <nav className="flex flex-wrap items-center gap-2 text-slate-600 sm:gap-3">
           <span
