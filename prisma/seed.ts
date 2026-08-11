@@ -6,9 +6,9 @@ async function main() {
   const locations = [
     { name: 'Sala de aula', type: 'classroom' },
     { name: 'Área externa', type: 'external' },
-    { name: 'Área administrativa', type: 'administrative' },
+    { name: 'Administrativo', type: 'administrative' },
     { name: 'Banheiro', type: 'restroom' },
-    { name: 'Laboratórios', type: 'lab' },
+    { name: 'Laboratório', type: 'lab' },
   ];
 
   const locationCount = await prisma.location.count();
