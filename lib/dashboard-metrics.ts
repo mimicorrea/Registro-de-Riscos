@@ -12,7 +12,7 @@ export type MetricsOccurrence = {
   dueDate: Date | string | null;
   reporter: { name: string | null } | null;
   isAnonymous?: boolean;
-  location: { name: string } | null;
+  location: { id: string; name: string } | null;
   statusHistory: { current: OccurrenceStatus; createdAt: Date | string }[];
   attachments?: { id: string; url: string; label: string | null }[];
 };

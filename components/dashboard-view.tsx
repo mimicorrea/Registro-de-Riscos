@@ -32,6 +32,7 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
     statuses: [],
     severities: [],
     categories: [],
+    locationIds: [],
     search: '',
   });
 

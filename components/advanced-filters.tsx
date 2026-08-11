@@ -6,7 +6,7 @@ import {
   type OccurrenceStatus,
 } from '@/lib/enums';
 import { Filter, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: FilterState) => void;
@@ -18,10 +18,16 @@ export interface FilterState {
   statuses: OccurrenceStatus[];
   severities: OccurrenceSeverity[];
   categories: OccurrenceCategory[];
+  locationIds: string[];
   search: string;
   dateFrom?: string;
   dateTo?: string;
   assigneeId?: string;
+}
+
+interface LocationOption {
+  id: string;
+  name: string;
 }
 
 const STATUS_OPTIONS: Array<{ value: OccurrenceStatus; label: string }> = [
@@ -55,8 +61,17 @@ export default function AdvancedFilters({
     statuses: [],
     severities: [],
     categories: [],
+    locationIds: [],
     search: '',
   });
+  const [locations, setLocations] = useState<LocationOption[]>([]);
+
+  useEffect(() => {
+    fetch('/api/locations')
+      .then((res) => res.json())
+      .then((data) => setLocations(data.locations ?? []))
+      .catch(() => setLocations([]));
+  }, []);
 
   const handleStatusToggle = (status: OccurrenceStatus) => {
     const updated = filters.statuses.includes(status)
@@ -79,6 +94,13 @@ export default function AdvancedFilters({
     updateFilters({ ...filters, categories: updated });
   };
 
+  const handleLocationToggle = (locationId: string) => {
+    const updated = filters.locationIds.includes(locationId)
+      ? filters.locationIds.filter((id) => id !== locationId)
+      : [...filters.locationIds, locationId];
+    updateFilters({ ...filters, locationIds: updated });
+  };
+
   const updateFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -89,6 +111,7 @@ export default function AdvancedFilters({
       statuses: [],
       severities: [],
       categories: [],
+      locationIds: [],
       search: '',
     };
     setFilters(emptyFilters);
@@ -99,6 +122,7 @@ export default function AdvancedFilters({
     filters.statuses.length +
     filters.severities.length +
     filters.categories.length +
+    filters.locationIds.length +
     (filters.search ? 1 : 0);
 
   return (
@@ -193,6 +217,28 @@ export default function AdvancedFilters({
               ))}
             </div>
           </div>
+
+          {/* Location */}
+          {locations.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-2">
+                Local da ocorrência
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {locations.map((location) => (
+                  <label key={location.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.locationIds.includes(location.id)}
+                      onChange={() => handleLocationToggle(location.id)}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm text-slate-600">{location.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Date Range */}
           <div className="grid grid-cols-2 gap-3">

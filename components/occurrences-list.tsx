@@ -34,6 +34,7 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
     statuses: [],
     severities: [],
     categories: [],
+    locationIds: [],
     search: '',
   });
 
@@ -69,7 +70,10 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
               updatedAt: c.createdAt,
               dueDate: null,
               reporter: { name: null },
-              location: c.locationName ? { name: c.locationName } : null,
+              // Cache offline só guarda o nome do local, não o id — o filtro
+              // por local fica indisponível para itens cacheados (edge case
+              // aceitável: só ocorre sem conexão e sem dados frescos).
+              location: c.locationName ? { id: '', name: c.locationName } : null,
               statusHistory: [],
             }))
           );
