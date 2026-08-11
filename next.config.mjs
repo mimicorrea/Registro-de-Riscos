@@ -56,12 +56,17 @@ const withPWA = withPWAInit({
       },
     },
     {
+      // NetworkFirst só cai no cache quando a rede falha/demora — mas um
+      // cache de 24h aqui significa que, se a rede do celular estiver lenta
+      // no momento certo, o app pode ficar até 1 dia servindo uma versão
+      // antiga da página mesmo já tendo saído deploy novo. 5 minutos ainda
+      // dá uma janela curta de fallback offline sem esse risco.
       urlPattern: ({ request }) => request.destination === 'document',
       handler: 'NetworkFirst',
       options: {
         cacheName: 'pages',
         networkTimeoutSeconds: 10,
-        expiration: { maxEntries: 16, maxAgeSeconds: 24 * 60 * 60 },
+        expiration: { maxEntries: 16, maxAgeSeconds: 5 * 60 },
       },
     },
   ],
