@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useMemo, useState } from 'react';
-import { CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer } from 'lucide-react';
+import { CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer, Trash2 } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
 import { LazyImage } from '@/components/lazy-image';
 import StatusBadge from '@/components/status-badge';
@@ -27,7 +28,9 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ occurrences, userName }: DashboardViewProps) {
+  const router = useRouter();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     statuses: [],
     severities: [],
@@ -67,6 +70,30 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
               : 'bg-emerald-400',
     };
   });
+
+  const handleDelete = async (event: React.MouseEvent, occurrenceId: string, title: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const confirmed = window.confirm(
+      `Excluir a ocorrência "${title}"? Essa ação não pode ser desfeita — fotos, comentários e histórico também serão removidos.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(occurrenceId);
+    try {
+      const res = await fetch(`/api/occurrences/${occurrenceId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Erro ao excluir ocorrência');
+      }
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao excluir ocorrência');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
@@ -237,6 +264,16 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                         {SEVERITY_LABELS[occurrence.severity]}
                       </span>
                       <StatusBadge status={occurrence.status} />
+                      <button
+                        type="button"
+                        onClick={(event) => handleDelete(event, occurrence.id, occurrence.title)}
+                        disabled={deletingId === occurrence.id}
+                        title="Excluir ocorrência"
+                        className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {deletingId === occurrence.id ? 'Excluindo...' : 'Excluir'}
+                      </button>
                     </div>
                   </div>
                 </Link>
