@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { CameraCapture } from './camera-capture';
 import { LazyImage } from './lazy-image';
-import { Trash2, Eye } from 'lucide-react';
+import { Trash2, Eye, AlertCircle } from 'lucide-react';
 import { compressImage, isHeicFile, validateImageFile } from '@/lib/image-utils';
 
 const MAX_IMAGES = 5;
@@ -33,8 +33,12 @@ export function ImageUpload({
     setError('');
     setLoading(true);
     try {
-      const compressed = await compressImage(dataUrl);
-      onChange([...images, compressed]);
+      // Se a compressão falhar por qualquer motivo, usa a imagem original em
+      // vez de descartar a foto — antes, uma falha aqui perdia a foto
+      // silenciosamente e o formulário era enviado sem ela, sem bloquear o
+      // envio nem deixar claro para quem preencheu.
+      const processed = await compressImage(dataUrl).catch(() => dataUrl);
+      onChange([...images, processed]);
     } catch {
       setError('Não foi possível processar a imagem.');
     } finally {
@@ -67,7 +71,11 @@ export function ImageUpload({
         // Diferente do Cloudinary, o armazenamento atual (Vercel Blob) não
         // converte formato — a foto HEIC é salva como está e pode não exibir
         // preview em navegadores sem suporte nativo a HEIC (ex.: Chrome Android).
-        const processed = isHeicFile(file) ? dataUrl : await compressImage(dataUrl);
+        // Para os demais formatos, se a compressão falhar por qualquer outro
+        // motivo, também cai para a imagem original em vez de descartar a
+        // foto — só falha de verdade (e bloqueia) se nem a leitura do
+        // arquivo funcionar.
+        const processed = isHeicFile(file) ? dataUrl : await compressImage(dataUrl).catch(() => dataUrl);
         nextImages.push(processed);
       } catch {
         setError('Falha ao processar uma das imagens.');
@@ -98,7 +106,12 @@ export function ImageUpload({
           {label} ({images.length}/{maxImages})
         </span>
 
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && (
+          <div className="mt-2 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
 
         {canAddMore && !showCamera && (
           <div className="mt-3 space-y-3">
