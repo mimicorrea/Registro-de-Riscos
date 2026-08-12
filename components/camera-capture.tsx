@@ -13,6 +13,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   const { videoRef, canvasRef, isCameraActive, error, startCamera, stopCamera, capturePhoto, hasCamera } = useCamera();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [captureError, setCaptureError] = useState('');
 
   const handleStartCamera = async () => {
     setLoading(true);
@@ -23,7 +24,13 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   const handleCapture = () => {
     const photo = capturePhoto();
     if (photo) {
+      setCaptureError('');
       setCapturedImage(photo);
+    } else {
+      // Acontece quando a câmera ainda não terminou de carregar o primeiro
+      // frame (toque muito rápido em "Capturar foto"). Sem esse aviso, nada
+      // acontece na tela e a foto simplesmente não é anexada, sem erro.
+      setCaptureError('A câmera ainda está carregando. Aguarde um instante e tente capturar de novo.');
     }
   };
 
@@ -73,6 +80,11 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4">
         <video ref={videoRef} autoPlay playsInline muted controls className="w-full rounded-2xl bg-black" />
         <canvas ref={canvasRef} className="hidden" />
+        {captureError && (
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {captureError}
+          </p>
+        )}
         <div className="flex gap-3">
           <button
             onClick={handleCapture}
