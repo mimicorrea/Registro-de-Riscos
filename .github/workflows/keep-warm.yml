@@ -1,0 +1,20 @@
+name: Keep app warm
+
+# Faz ping periódico no site para evitar o "gelo" duplo do plano gratuito:
+# o banco de dados (Neon) hiberna após ~5 minutos sem uso, e as funções da
+# Vercel também "esfriam" entre acessos. A primeira consulta depois disso
+# demora ~2s a mais (medido: 2025ms fria vs 88ms quente) — esse ping evita
+# que o app fique tempo suficiente parado para hibernar.
+on:
+  schedule:
+    - cron: '*/4 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping registro-de-riscos
+        run: curl -s -o /dev/null -w "registro-de-riscos: %{http_code}\n" https://registro-de-riscos.vercel.app/api/locations
+      - name: Ping registro-de-riscos-lbuu
+        run: curl -s -o /dev/null -w "registro-de-riscos-lbuu: %{http_code}\n" https://registro-de-riscos-lbuu.vercel.app/api/locations
