@@ -113,3 +113,36 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Só gestor/admin pode excluir — igual à regra de mudança de status.
+    if (session.user.role === 'EMPLOYEE') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { id } = await params;
+
+    const occurrence = await prisma.occurrence.findUnique({ where: { id } });
+    if (!occurrence) {
+      return NextResponse.json({ error: 'Occurrence not found' }, { status: 404 });
+    }
+
+    // Comentários, anexos e histórico de status são removidos em cascata
+    // (onDelete: Cascade no schema).
+    await prisma.occurrence.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[DELETE /api/occurrences/[id]]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
