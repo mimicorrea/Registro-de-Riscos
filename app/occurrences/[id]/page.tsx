@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth';
+import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
@@ -57,12 +58,12 @@ export default async function OccurrencePage({ params }: PageProps) {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">❌ Ocorrência não encontrada</h1>
           <p className="text-slate-400 mb-6">A ocorrência que você procura não existe ou foi removida.</p>
-          <a
+          <Link
             href="/occurrences"
             className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
           >
             ← Voltar para Ocorrências
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -80,12 +81,12 @@ export default async function OccurrencePage({ params }: PageProps) {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">🔒 Acesso Negado</h1>
           <p className="text-slate-400 mb-6">Você não tem permissão para ver esta ocorrência.</p>
-          <a
+          <Link
             href="/occurrences"
             className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
           >
             ← Voltar para Ocorrências
-          </a>
+          </Link>
         </div>
       </div>
     );
