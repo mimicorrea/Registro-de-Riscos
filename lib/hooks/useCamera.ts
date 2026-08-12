@@ -131,6 +131,16 @@ export function useCamera(): UseCamera {
 
     if (!ctx) return null;
 
+    // Se o vídeo ainda não carregou o primeiro frame (ex.: usuário toca em
+    // "Capturar foto" muito rápido, antes da câmera terminar de iniciar),
+    // videoWidth/videoHeight ficam 0 — desenhar isso gera um canvas 0x0 e
+    // capturePhoto() "funcionaria" retornando uma imagem em branco, sem
+    // erro nenhum. Detectamos esse caso aqui e retornamos null para o
+    // componente poder avisar em vez de deixar a foto sumir em silêncio.
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      return null;
+    }
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
