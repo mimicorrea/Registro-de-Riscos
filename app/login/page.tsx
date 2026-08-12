@@ -19,17 +19,28 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      // Timeout de segurança: se a rede/banco estiver muito lento (ex.: banco
+      // "hibernado", ver keep-warm.yml) e o login nunca responder, evita
+      // deixar o botão presa em "Entrando..." pra sempre — melhor mostrar um
+      // erro e deixar tentar de novo.
+      const result = await withTimeout(
+        signIn('credentials', { email, password, redirect: false }),
+        20000
+      );
 
-    if (result?.error) {
-      setError('E-mail ou senha inválidos.');
+      if (result?.error) {
+        setError('E-mail ou senha inválidos.');
+        setLoading(false);
+      } else if (result?.ok) {
+        router.push('/dashboard');
+      } else {
+        setError('Não foi possível entrar. Tente novamente.');
+        setLoading(false);
+      }
+    } catch {
+      setError('A conexão demorou demais. Verifique sua internet e tente novamente.');
       setLoading(false);
-    } else if (result?.ok) {
-      router.push('/dashboard');
     }
   };
 
@@ -104,4 +115,20 @@ export default function LoginPage() {
       </div>
     </main>
   );
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timeout')), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
 }
