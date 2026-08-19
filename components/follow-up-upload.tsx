@@ -14,9 +14,10 @@ export default function FollowUpUpload({ occurrenceId }: FollowUpUploadProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
 
   const handleUpload = async () => {
-    if (images.length === 0) return;
+    if (images.length === 0 || processingImage) return;
 
     setLoading(true);
     setError('');
@@ -65,6 +66,7 @@ export default function FollowUpUpload({ occurrenceId }: FollowUpUploadProps) {
       <ImageUpload
         value={images}
         onChange={setImages}
+        onProcessingChange={setProcessingImage}
         label="Fotos da correção"
         maxImages={3}
       />
@@ -76,10 +78,10 @@ export default function FollowUpUpload({ occurrenceId }: FollowUpUploadProps) {
         <button
           type="button"
           onClick={handleUpload}
-          disabled={loading}
+          disabled={loading || processingImage}
           className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? 'Enviando...' : 'Salvar fotos de correção'}
+          {loading ? 'Enviando...' : processingImage ? 'Processando foto...' : 'Salvar fotos de correção'}
         </button>
       )}
     </div>
