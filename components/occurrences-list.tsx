@@ -51,6 +51,8 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
             createdAt: String(o.createdAt),
             locationName: o.location?.name,
             resolutionPhotoUrl: o.attachments?.[0]?.url,
+            adminCommentAuthor: o.comments?.[0]?.author.name ?? undefined,
+            adminCommentContent: o.comments?.[0]?.content,
           }))
         );
         setUsingCache(false);
@@ -79,6 +81,16 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
               statusHistory: [],
               attachments: c.resolutionPhotoUrl
                 ? [{ id: '', url: c.resolutionPhotoUrl, label: 'Correção' }]
+                : undefined,
+              comments: c.adminCommentContent
+                ? [
+                    {
+                      id: '',
+                      content: c.adminCommentContent,
+                      createdAt: c.createdAt,
+                      author: { name: c.adminCommentAuthor ?? null },
+                    },
+                  ]
                 : undefined,
             }))
           );
@@ -172,6 +184,15 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
                     <StatusBadge status={item.status} />
                   </div>
                 </div>
+
+                {item.comments?.[0] && (
+                  <div className="mt-4 rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                    <span className="font-semibold">
+                      🗨️ {item.comments[0].author.name ?? 'Administrador'}:
+                    </span>{' '}
+                    <span className="line-clamp-2">{item.comments[0].content}</span>
+                  </div>
+                )}
               </article>
             );
 
