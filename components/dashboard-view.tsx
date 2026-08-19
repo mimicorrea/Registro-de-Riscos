@@ -27,6 +27,17 @@ interface DashboardViewProps {
   userName: string;
 }
 
+// Separa a foto original (enviada por quem registrou) da foto de resolução
+// (enviada pelo gestor ao tratar/resolver o problema) para exibir as duas
+// lado a lado no card da ocorrência.
+function getOccurrencePhotos(occurrence: MetricsOccurrence) {
+  const attachments = occurrence.attachments ?? [];
+  const original = attachments.find((a) => !a.label?.startsWith('Correção')) ?? null;
+  const resolution =
+    [...attachments].reverse().find((a) => a.label?.startsWith('Correção')) ?? null;
+  return { original, resolution };
+}
+
 export default function DashboardView({ occurrences, userName }: DashboardViewProps) {
   const router = useRouter();
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -229,7 +240,9 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
 
           {filtered.length > 0 ? (
             <div className="mt-6 space-y-4">
-              {filtered.slice(0, 15).map((occurrence) => (
+              {filtered.slice(0, 15).map((occurrence) => {
+                const { original, resolution } = getOccurrencePhotos(occurrence);
+                return (
                 <Link
                   key={occurrence.id}
                   href={`/occurrences/${occurrence.id}`}
@@ -237,12 +250,29 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex min-w-0 flex-1 gap-4">
-                      {occurrence.attachments?.[0] && (
-                        <LazyImage
-                          src={occurrence.attachments[0].url}
-                          alt={occurrence.attachments[0].label || 'Foto da ocorrência'}
-                          className="h-16 w-16 shrink-0 rounded-2xl"
-                        />
+                      {(original || resolution) && (
+                        <div className="flex shrink-0 gap-2">
+                          {original && (
+                            <div className="text-center">
+                              <LazyImage
+                                src={original.url}
+                                alt={original.label || 'Foto da ocorrência'}
+                                className="h-16 w-16 rounded-2xl"
+                              />
+                              <span className="mt-1 block text-[10px] text-slate-400">Original</span>
+                            </div>
+                          )}
+                          {resolution && (
+                            <div className="text-center">
+                              <LazyImage
+                                src={resolution.url}
+                                alt={resolution.label || 'Foto da resolução'}
+                                className="h-16 w-16 rounded-2xl"
+                              />
+                              <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>
+                            </div>
+                          )}
+                        </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <h3 className="text-lg font-semibold text-slate-900">{occurrence.title}</h3>
@@ -277,7 +307,8 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                     </div>
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="mt-6 text-center text-slate-500">Nenhuma ocorrência corresponde aos filtros.</p>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, WifiOff } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
+import { LazyImage } from '@/components/lazy-image';
 import StatusBadge from '@/components/status-badge';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { cacheOccurrences, getCachedOccurrences } from '@/lib/offline-db';
@@ -49,6 +50,7 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
             severity: o.severity,
             createdAt: String(o.createdAt),
             locationName: o.location?.name,
+            resolutionPhotoUrl: o.attachments?.[0]?.url,
           }))
         );
         setUsingCache(false);
@@ -75,6 +77,9 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
               // aceitável: só ocorre sem conexão e sem dados frescos).
               location: c.locationName ? { id: '', name: c.locationName } : null,
               statusHistory: [],
+              attachments: c.resolutionPhotoUrl
+                ? [{ id: '', url: c.resolutionPhotoUrl, label: 'Correção' }]
+                : undefined,
             }))
           );
           setUsingCache(true);
@@ -129,19 +134,31 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
             const card = (
               <article className="rounded-3xl border border-slate-200 bg-white p-5 transition hover:border-brand-400 hover:shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <h2 className="text-xl font-semibold text-slate-900">{item.title}</h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                      {item.location?.name ?? 'Local não informado'} ·{' '}
-                      {new Date(item.createdAt).toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                      {isManager
-                        ? ` · ${item.reporter?.name ?? (item.isAnonymous ? 'Anônimo' : 'Usuário')}`
-                        : ''}
-                    </p>
+                  <div className="flex min-w-0 flex-1 items-center gap-4">
+                    {item.attachments?.[0] && (
+                      <div className="shrink-0 text-center">
+                        <LazyImage
+                          src={item.attachments[0].url}
+                          alt={item.attachments[0].label || 'Foto da resolução'}
+                          className="h-16 w-16 rounded-2xl"
+                        />
+                        <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <h2 className="text-xl font-semibold text-slate-900">{item.title}</h2>
+                      <p className="mt-2 text-sm text-slate-500">
+                        {item.location?.name ?? 'Local não informado'} ·{' '}
+                        {new Date(item.createdAt).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                        {isManager
+                          ? ` · ${item.reporter?.name ?? (item.isAnonymous ? 'Anônimo' : 'Usuário')}`
+                          : ''}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {item.isAnonymous && (

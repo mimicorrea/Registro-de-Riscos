@@ -26,10 +26,12 @@ export default async function DashboardPage() {
       reporter: { select: { name: true } },
       location: { select: { id: true, name: true } },
       statusHistory: { select: { current: true, createdAt: true } },
+      // Busca todos os anexos (não só o primeiro) para poder mostrar, lado a
+      // lado, a foto original enviada no upload e a foto de resolução
+      // enviada pelo gestor ao tratar o problema.
       attachments: {
         select: { id: true, url: true, label: true },
         orderBy: { createdAt: 'asc' },
-        take: 1,
       },
     },
     orderBy: { createdAt: 'desc' },
