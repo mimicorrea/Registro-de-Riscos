@@ -36,6 +36,15 @@ export default async function OccurrencesPage() {
         orderBy: { createdAt: 'desc' },
         take: 1,
       },
+      // Prévia do último comentário do admin/gestor no card — quem reportou
+      // (ou o público, se for o caso) vê o retorno sem precisar abrir o
+      // detalhe, que fica restrito a admin/gestor ou ao próprio autor.
+      comments: {
+        where: { author: { role: { in: [RoleName.ADMIN, RoleName.MANAGER] } } },
+        select: { id: true, content: true, createdAt: true, author: { select: { name: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
     },
     orderBy: { createdAt: 'desc' },
   })) as MetricsOccurrence[];

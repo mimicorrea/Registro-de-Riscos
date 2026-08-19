@@ -36,6 +36,8 @@ export type CachedOccurrence = {
   createdAt: string;
   locationName?: string;
   resolutionPhotoUrl?: string;
+  adminCommentAuthor?: string;
+  adminCommentContent?: string;
 };
 
 function openDb(): Promise<IDBDatabase> {

@@ -15,6 +15,7 @@ export type MetricsOccurrence = {
   location: { id: string; name: string } | null;
   statusHistory: { current: OccurrenceStatus; createdAt: Date | string }[];
   attachments?: { id: string; url: string; label: string | null }[];
+  comments?: { id: string; content: string; createdAt: Date | string; author: { name: string | null } }[];
 };
 
 export type DashboardKpis = {
