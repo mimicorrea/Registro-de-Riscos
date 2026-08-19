@@ -35,6 +35,7 @@ export type CachedOccurrence = {
   severity: string;
   createdAt: string;
   locationName?: string;
+  resolutionPhotoUrl?: string;
 };
 
 function openDb(): Promise<IDBDatabase> {
