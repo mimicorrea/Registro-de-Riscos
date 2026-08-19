@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, WifiOff } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
-import { LazyImage } from '@/components/lazy-image';
+import { ExpandableImage } from '@/components/expandable-image';
 import StatusBadge from '@/components/status-badge';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { cacheOccurrences, getCachedOccurrences } from '@/lib/offline-db';
@@ -149,9 +149,10 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     {item.attachments?.[0] && (
                       <div className="shrink-0 text-center">
-                        <LazyImage
+                        <ExpandableImage
                           src={item.attachments[0].url}
                           alt={item.attachments[0].label || 'Foto da resolução'}
+                          caption={item.attachments[0].label}
                           className="h-16 w-16 rounded-2xl"
                         />
                         <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>

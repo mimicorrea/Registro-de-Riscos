@@ -6,7 +6,7 @@ import { signOut } from 'next-auth/react';
 import { useMemo, useState } from 'react';
 import { CheckCircle2, Clock, Download, FileText, LogOut, ShieldAlert, Timer, Trash2 } from 'lucide-react';
 import AdvancedFilters, { type FilterState } from '@/components/advanced-filters';
-import { LazyImage } from '@/components/lazy-image';
+import { ExpandableImage } from '@/components/expandable-image';
 import StatusBadge from '@/components/status-badge';
 import {
   SEVERITY_LABELS,
@@ -254,9 +254,10 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                         <div className="flex shrink-0 gap-2">
                           {original && (
                             <div className="text-center">
-                              <LazyImage
+                              <ExpandableImage
                                 src={original.url}
                                 alt={original.label || 'Foto da ocorrência'}
+                                caption={original.label}
                                 className="h-16 w-16 rounded-2xl"
                               />
                               <span className="mt-1 block text-[10px] text-slate-400">Original</span>
@@ -264,9 +265,10 @@ export default function DashboardView({ occurrences, userName }: DashboardViewPr
                           )}
                           {resolution && (
                             <div className="text-center">
-                              <LazyImage
+                              <ExpandableImage
                                 src={resolution.url}
                                 alt={resolution.label || 'Foto da resolução'}
+                                caption={resolution.label}
                                 className="h-16 w-16 rounded-2xl"
                               />
                               <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>

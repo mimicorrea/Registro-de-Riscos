@@ -11,7 +11,7 @@ import AssigneeSelect from './assignee-select';
 import DueDateModal from './due-date-modal';
 import FollowUpUpload from './follow-up-upload';
 import CommentThread from './comment-thread';
-import { LazyImage } from './lazy-image';
+import { ExpandableImage } from './expandable-image';
 import { formatDistanceToNow } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { SEVERITY_LABELS, STATUS_LABELS } from '@/lib/enums';
@@ -250,9 +250,10 @@ export default function OccurrenceDetail({
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {correctionPhotos.map((attachment) => (
                     <div key={attachment.id} className="group relative">
-                      <LazyImage
+                      <ExpandableImage
                         src={attachment.url}
                         alt={attachment.label || 'Foto'}
+                        caption={attachment.label}
                         className="h-40 w-full rounded-lg"
                       />
                       {attachment.label && (
