@@ -52,6 +52,7 @@ export function OccurrenceForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [queuedOffline, setQueuedOffline] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,6 +70,11 @@ export function OccurrenceForm() {
 
     if (form.description.trim().length < 5) {
       setError('A descrição deve ter pelo menos 5 caracteres.');
+      return;
+    }
+
+    if (processingImage) {
+      setError('Aguarde a foto terminar de processar antes de enviar.');
       return;
     }
 
@@ -258,6 +264,7 @@ export function OccurrenceForm() {
       <ImageUpload
         value={form.images}
         onChange={(images) => setForm({ ...form, images })}
+        onProcessingChange={setProcessingImage}
         label="Fotos do problema (câmera ou galeria)"
       />
 
@@ -286,10 +293,14 @@ export function OccurrenceForm() {
 
       <button
         type="submit"
-        disabled={loading || success}
+        disabled={loading || success || processingImage}
         className="inline-flex w-full items-center justify-center rounded-3xl bg-blue-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? 'Registrando...' : 'Registrar ocorrência'}
+        {loading
+          ? 'Registrando...'
+          : processingImage
+            ? 'Processando foto...'
+            : 'Registrar ocorrência'}
       </button>
     </form>
   );

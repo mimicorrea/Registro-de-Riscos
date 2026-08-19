@@ -41,6 +41,7 @@ export function AnonymousOccurrenceForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [protocol, setProtocol] = useState<string | null>(null);
+  const [processingImage, setProcessingImage] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -58,6 +59,11 @@ export function AnonymousOccurrenceForm() {
 
     if (!isOnline()) {
       setError('Você está offline. Conecte-se à internet para enviar o registro anônimo.');
+      return;
+    }
+
+    if (processingImage) {
+      setError('Aguarde a foto terminar de processar antes de enviar.');
       return;
     }
 
@@ -203,15 +209,20 @@ export function AnonymousOccurrenceForm() {
       <ImageUpload
         value={form.images}
         onChange={(images) => setForm({ ...form, images })}
+        onProcessingChange={setProcessingImage}
         label="Fotos do problema (câmera ou galeria)"
       />
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || processingImage}
         className="inline-flex w-full items-center justify-center rounded-3xl bg-blue-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? 'Enviando...' : 'Registrar ocorrência anônima'}
+        {loading
+          ? 'Enviando...'
+          : processingImage
+            ? 'Processando foto...'
+            : 'Registrar ocorrência anônima'}
       </button>
     </form>
   );

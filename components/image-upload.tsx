@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CameraCapture } from './camera-capture';
 import { LazyImage } from './lazy-image';
 import { Trash2, Eye, AlertCircle } from 'lucide-react';
@@ -13,6 +13,10 @@ interface ImageUploadProps {
   onChange: (images: string[]) => void;
   label?: string;
   maxImages?: number;
+  /** Avisa o formulário pai enquanto uma foto ainda está sendo lida/comprimida
+   * — sem isso, é possível enviar o formulário entre o clique em "tirar foto"
+   * e a foto de fato entrar em `value`, registrando a ocorrência sem ela. */
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 export function ImageUpload({
@@ -20,11 +24,16 @@ export function ImageUpload({
   onChange,
   label = 'Fotos do problema',
   maxImages = MAX_IMAGES,
+  onProcessingChange,
 }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    onProcessingChange?.(loading);
+  }, [loading, onProcessingChange]);
 
   const images = value;
   const canAddMore = images.length < maxImages;
