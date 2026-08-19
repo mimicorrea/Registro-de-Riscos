@@ -2,7 +2,13 @@ name: Keep app warm
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    # O banco (Neon) hiberna após ~5min sem uso. Com ping a cada 10min ele
+    # tinha tempo de sobra para hibernar entre um ping e o próximo, e quem
+    # tentasse logar nesse meio-tempo pagava o cold start (banco "acordando").
+    # A cada 5min é o mínimo prático do cron do GitHub Actions e cobre bem
+    # a janela de hibernação — ainda pode haver atraso ocasional na fila do
+    # Actions, mas a frequência agora bate com o timeout do banco.
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 jobs:

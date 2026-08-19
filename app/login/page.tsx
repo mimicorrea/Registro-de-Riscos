@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -13,6 +13,14 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Pré-aquece o banco (Neon hiberna após ~5min sem uso) assim que a tela de
+  // login carrega, em paralelo com o tempo que a pessoa leva digitando
+  // email/senha — o cold start acontece escondido aqui em vez de acontecer
+  // no momento do submit, quando a demora é sentida como "login lento".
+  useEffect(() => {
+    fetch('/api/locations').catch(() => {});
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
