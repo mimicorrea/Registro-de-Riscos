@@ -13,9 +13,11 @@ interface ImageUploadProps {
   onChange: (images: string[]) => void;
   label?: string;
   maxImages?: number;
-  /** Avisa o formulário pai enquanto uma foto ainda está sendo lida/comprimida
-   * — sem isso, é possível enviar o formulário entre o clique em "tirar foto"
-   * e a foto de fato entrar em `value`, registrando a ocorrência sem ela. */
+  /** Avisa o formulário pai enquanto a foto ainda não está de fato em `value`
+   * — durante a leitura/compressão, mas também durante todo o fluxo da
+   * câmera (abrir, ver o vídeo, capturar e confirmar). Sem isso, é possível
+   * enviar o formulário entre tirar a foto e clicar em "Usar foto",
+   * registrando a ocorrência sem a foto que a pessoa acabou de tirar. */
   onProcessingChange?: (processing: boolean) => void;
 }
 
@@ -32,8 +34,8 @@ export function ImageUpload({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    onProcessingChange?.(loading);
-  }, [loading, onProcessingChange]);
+    onProcessingChange?.(loading || showCamera);
+  }, [loading, showCamera, onProcessingChange]);
 
   const images = value;
   const canAddMore = images.length < maxImages;

@@ -221,7 +221,7 @@ export function AnonymousOccurrenceForm() {
         {loading
           ? 'Enviando...'
           : processingImage
-            ? 'Processando foto...'
+            ? 'Finalize a foto para continuar...'
             : 'Registrar ocorrência anônima'}
       </button>
     </form>
