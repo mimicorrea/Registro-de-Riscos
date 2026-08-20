@@ -299,7 +299,7 @@ export function OccurrenceForm() {
         {loading
           ? 'Registrando...'
           : processingImage
-            ? 'Processando foto...'
+            ? 'Finalize a foto para continuar...'
             : 'Registrar ocorrência'}
       </button>
     </form>

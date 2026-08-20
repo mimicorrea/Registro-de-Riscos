@@ -81,7 +81,11 @@ export default function FollowUpUpload({ occurrenceId }: FollowUpUploadProps) {
           disabled={loading || processingImage}
           className="inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? 'Enviando...' : processingImage ? 'Processando foto...' : 'Salvar fotos de correção'}
+          {loading
+            ? 'Enviando...'
+            : processingImage
+              ? 'Finalize a foto para continuar...'
+              : 'Salvar fotos de correção'}
         </button>
       )}
     </div>
