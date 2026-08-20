@@ -27,14 +27,12 @@ export default async function OccurrencesPage() {
       reporter: { select: { name: true } },
       location: { select: { id: true, name: true } },
       statusHistory: { select: { current: true, createdAt: true } },
-      // Só a foto de resolução (enviada pelo gestor ao tratar o problema)
-      // aparece aqui — a foto original de quem reportou continua restrita
-      // ao dashboard, por decisão anterior de privacidade.
+      // Foto original (enviada por quem registrou) e foto de resolução
+      // (enviada pelo admin/gestor ao tratar o problema) — as duas aparecem
+      // aqui pra todo mundo, autenticado ou não.
       attachments: {
-        where: { label: { startsWith: 'Correção' } },
         select: { id: true, url: true, label: true },
-        orderBy: { createdAt: 'desc' },
-        take: 1,
+        orderBy: { createdAt: 'asc' },
       },
       // Prévia do último comentário do admin/gestor no card — quem reportou
       // (ou o público, se for o caso) vê o retorno sem precisar abrir o
