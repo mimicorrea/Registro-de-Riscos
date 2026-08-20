@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import OccurrencesList from '@/components/occurrences-list';
 import { RoleName } from '@/lib/enums';
-import type { MetricsOccurrence } from '@/lib/dashboard-metrics';
+import { getOccurrencePhotos, type MetricsOccurrence } from '@/lib/dashboard-metrics';
 
 export const metadata = {
   title: 'Ocorrências',
@@ -46,6 +46,16 @@ export default async function OccurrencesPage() {
     },
     orderBy: { createdAt: 'desc' },
   })) as MetricsOccurrence[];
+
+  // A foto original só é revelada aqui depois que a ocorrência é concluída
+  // E o admin/gestor envia a foto de resolução — até lá, ela fica restrita
+  // ao dashboard. Removemos os anexos por completo (não só na exibição) pra
+  // a foto nem chegar no HTML/payload da página enquanto isso não acontece.
+  const occurrencesForList = occurrences.map((occurrence) => {
+    const { resolution } = getOccurrencePhotos(occurrence);
+    const photosRevealed = occurrence.status === 'RESOLVED' && Boolean(resolution);
+    return photosRevealed ? occurrence : { ...occurrence, attachments: [] };
+  });
 
   const subtitle = isManager
     ? 'Todas as ocorrências da empresa'
@@ -88,7 +98,7 @@ export default async function OccurrencesPage() {
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6">
           <OccurrencesList
-            occurrences={occurrences}
+            occurrences={occurrencesForList}
             isManager={isManager}
             clickable={isAuthenticated}
           />
