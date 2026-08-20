@@ -17,6 +17,7 @@ import {
   buildTrend,
   calculateKpis,
   formatHours,
+  getOccurrencePhotos,
   type MetricsOccurrence,
 } from '@/lib/dashboard-metrics';
 import { exportOccurrencesToCsv } from '@/lib/export-utils';
@@ -25,17 +26,6 @@ import { applyFilters } from '@/lib/filter-occurrences';
 interface DashboardViewProps {
   occurrences: MetricsOccurrence[];
   userName: string;
-}
-
-// Separa a foto original (enviada por quem registrou) da foto de resolução
-// (enviada pelo gestor ao tratar/resolver o problema) para exibir as duas
-// lado a lado no card da ocorrência.
-function getOccurrencePhotos(occurrence: MetricsOccurrence) {
-  const attachments = occurrence.attachments ?? [];
-  const original = attachments.find((a) => !a.label?.startsWith('Correção')) ?? null;
-  const resolution =
-    [...attachments].reverse().find((a) => a.label?.startsWith('Correção')) ?? null;
-  return { original, resolution };
 }
 
 export default function DashboardView({ occurrences, userName }: DashboardViewProps) {

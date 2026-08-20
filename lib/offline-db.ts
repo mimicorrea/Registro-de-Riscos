@@ -35,6 +35,7 @@ export type CachedOccurrence = {
   severity: string;
   createdAt: string;
   locationName?: string;
+  originalPhotoUrl?: string;
   resolutionPhotoUrl?: string;
   adminCommentAuthor?: string;
   adminCommentContent?: string;

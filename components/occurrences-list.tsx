@@ -10,7 +10,7 @@ import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { cacheOccurrences, getCachedOccurrences } from '@/lib/offline-db';
 import { SEVERITY_LABELS, type OccurrenceSeverity, type OccurrenceStatus } from '@/lib/enums';
 import { applyFilters } from '@/lib/filter-occurrences';
-import type { MetricsOccurrence } from '@/lib/dashboard-metrics';
+import { getOccurrencePhotos, type MetricsOccurrence } from '@/lib/dashboard-metrics';
 
 type OccurrenceListItem = MetricsOccurrence & {
   id: string;
@@ -43,17 +43,21 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
     async function syncCache() {
       if (occurrences.length > 0) {
         await cacheOccurrences(
-          occurrences.map((o) => ({
-            id: o.id,
-            title: o.title,
-            status: o.status,
-            severity: o.severity,
-            createdAt: String(o.createdAt),
-            locationName: o.location?.name,
-            resolutionPhotoUrl: o.attachments?.[0]?.url,
-            adminCommentAuthor: o.comments?.[0]?.author.name ?? undefined,
-            adminCommentContent: o.comments?.[0]?.content,
-          }))
+          occurrences.map((o) => {
+            const { original, resolution } = getOccurrencePhotos(o);
+            return {
+              id: o.id,
+              title: o.title,
+              status: o.status,
+              severity: o.severity,
+              createdAt: String(o.createdAt),
+              locationName: o.location?.name,
+              originalPhotoUrl: original?.url,
+              resolutionPhotoUrl: resolution?.url,
+              adminCommentAuthor: o.comments?.[0]?.author.name ?? undefined,
+              adminCommentContent: o.comments?.[0]?.content,
+            };
+          })
         );
         setUsingCache(false);
         return;
@@ -79,9 +83,14 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
               // aceitável: só ocorre sem conexão e sem dados frescos).
               location: c.locationName ? { id: '', name: c.locationName } : null,
               statusHistory: [],
-              attachments: c.resolutionPhotoUrl
-                ? [{ id: '', url: c.resolutionPhotoUrl, label: 'Correção' }]
-                : undefined,
+              attachments: [
+                ...(c.originalPhotoUrl
+                  ? [{ id: '', url: c.originalPhotoUrl, label: 'Foto do problema' }]
+                  : []),
+                ...(c.resolutionPhotoUrl
+                  ? [{ id: '', url: c.resolutionPhotoUrl, label: 'Correção' }]
+                  : []),
+              ],
               comments: c.adminCommentContent
                 ? [
                     {
@@ -143,19 +152,35 @@ export default function OccurrencesList({ occurrences, isManager, clickable = tr
       ) : (
         <div className="space-y-4">
           {filtered.map((item) => {
+            const { original, resolution } = getOccurrencePhotos(item);
             const card = (
               <article className="rounded-3xl border border-slate-200 bg-white p-5 transition hover:border-brand-400 hover:shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex min-w-0 flex-1 items-center gap-4">
-                    {item.attachments?.[0] && (
-                      <div className="shrink-0 text-center">
-                        <ExpandableImage
-                          src={item.attachments[0].url}
-                          alt={item.attachments[0].label || 'Foto da resolução'}
-                          caption={item.attachments[0].label}
-                          className="h-16 w-16 rounded-2xl"
-                        />
-                        <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>
+                    {(original || resolution) && (
+                      <div className="flex shrink-0 gap-2">
+                        {original && (
+                          <div className="text-center">
+                            <ExpandableImage
+                              src={original.url}
+                              alt={original.label || 'Foto da ocorrência'}
+                              caption={original.label}
+                              className="h-16 w-16 rounded-2xl"
+                            />
+                            <span className="mt-1 block text-[10px] text-slate-400">Original</span>
+                          </div>
+                        )}
+                        {resolution && (
+                          <div className="text-center">
+                            <ExpandableImage
+                              src={resolution.url}
+                              alt={resolution.label || 'Foto da resolução'}
+                              caption={resolution.label}
+                              className="h-16 w-16 rounded-2xl"
+                            />
+                            <span className="mt-1 block text-[10px] text-emerald-500">Resolução</span>
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className="min-w-0">

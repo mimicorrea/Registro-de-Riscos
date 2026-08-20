@@ -18,6 +18,19 @@ export type MetricsOccurrence = {
   comments?: { id: string; content: string; createdAt: Date | string; author: { name: string | null } }[];
 };
 
+/**
+ * Separa a foto original (enviada por quem registrou a ocorrência) da foto
+ * de resolução (enviada pelo admin/gestor ao tratar o problema) — usada no
+ * dashboard e na lista de ocorrências pra mostrar as duas lado a lado.
+ */
+export function getOccurrencePhotos(occurrence: Pick<MetricsOccurrence, 'attachments'>) {
+  const attachments = occurrence.attachments ?? [];
+  const original = attachments.find((a) => !a.label?.startsWith('Correção')) ?? null;
+  const resolution =
+    [...attachments].reverse().find((a) => a.label?.startsWith('Correção')) ?? null;
+  return { original, resolution };
+}
+
 export type DashboardKpis = {
   mttrHours: number | null;
   avgResolutionHours: number | null;
